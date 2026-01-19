@@ -170,12 +170,12 @@ class AgentActivity(RecognitionHooks):
         """
         # Default ignore list (can be made configurable via env vars or options)
         IGNORED_WORDS = {"yeah", "ok", "hmm", "right", "uh-huh", "yes"}
-        
+
         # Simple tokenization: lower case and split
         words = split_words(transcript.lower().strip(), split_character=True)
         if not words:
             return False
-            
+
         return all(w in IGNORED_WORDS for w in words)
 
     def _validate_turn_detection(

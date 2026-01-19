@@ -17,7 +17,7 @@ TEST_AUDIO_FILEPATH = os.path.join(os.path.dirname(__file__), "change-sophie.opu
 
 @pytest.mark.asyncio
 async def test_decode_and_transcribe():
-    # Skip if test file doesn't exist
+    # Skip if test file doesn't exist (LFS file might be missing)
     if not os.path.exists(TEST_AUDIO_FILEPATH):
         pytest.skip(f"Test file not found: {TEST_AUDIO_FILEPATH}")
 

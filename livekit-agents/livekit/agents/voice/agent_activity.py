@@ -1388,10 +1388,10 @@ class AgentActivity(RecognitionHooks):
             if self._check_ignored(info.new_transcript):
                 logger.debug(
                     "ignoring soft interruption (backchanneling) in on_end_of_turn",
-                    extra={"transcript": info.new_transcript}
+                    extra={"transcript": info.new_transcript},
                 )
                 self._cancel_preemptive_generation()
-                return True # Commit the turn (clears buffer) but do nothing
+                return True  # Commit the turn (clears buffer) but do nothing
 
             if (
                 self._session.options.min_interruption_words > 0

@@ -87,7 +87,7 @@ jobs:
             deepgram,
             elevenlabs,
             groq,
-            openai,
+            # openai,
             inworld,
           ]
 

@@ -164,19 +164,13 @@ class AgentActivity(RecognitionHooks):
         # speeches that audio playout finished but not done because of tool calls
         self._background_speeches: set[SpeechHandle] = set()
 
-    def _should_ignore_transcript(self, transcript: str) -> bool:
-        """
-        Check if the transcript consists only of ignored words.
-        """
-        # Default ignore list (can be made configurable via env vars or options)
-        IGNORED_WORDS = {"yeah", "ok", "hmm", "right", "uh-huh", "yes"}
-
-        # Simple tokenization: lower case and split
-        words = split_words(transcript.lower().strip(), split_character=True)
-        if not words:
+    def _check_ignored(self, txt: str) -> bool:
+        ignore_set = {"yeah", "ok", "hmm", "right", "uh-huh", "yes"}
+        tokens = split_words(txt.lower().strip(), split_character=True)
+        if not tokens:
             return False
 
-        return all(w in IGNORED_WORDS for w in words)
+        return all(t in ignore_set for t in tokens)
 
     def _validate_turn_detection(
         self, turn_detection: TurnDetectionMode | None
@@ -1207,14 +1201,9 @@ class AgentActivity(RecognitionHooks):
             and not self._current_speech.interrupted
             and self._current_speech.allow_interruptions
         ):
-            # Check for soft interruption (backchanneling)
-            if self.stt is not None and self._audio_recognition is not None:
-                text = self._audio_recognition.current_transcript
-                if self._should_ignore_transcript(text):
-                    logger.debug(
-                        "ignoring soft interruption (backchanneling)",
-                        extra={"transcript": text}
-                    )
+            if self.stt and self._audio_recognition:
+                curr_txt = self._audio_recognition.current_transcript
+                if self._check_ignored(curr_txt):
                     return
 
             self._paused_speech = self._current_speech
@@ -1396,8 +1385,7 @@ class AgentActivity(RecognitionHooks):
             and self._current_speech.allow_interruptions
             and not self._current_speech.interrupted
         ):
-            # Check for soft interruption (backchanneling)
-            if self._should_ignore_transcript(info.new_transcript):
+            if self._check_ignored(info.new_transcript):
                 logger.debug(
                     "ignoring soft interruption (backchanneling) in on_end_of_turn",
                     extra={"transcript": info.new_transcript}
